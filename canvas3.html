@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <style>
+        #myCanvas{
+            margin-top: 200px;
+        }
+        #btn{
+            width: 70px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body style="display: flex;flex-direction: column;align-items: center;">
+    <canvas id='myCanvas' width="520px" height="520px"></canvas>
+    <button id='btn' onclick="tailoring()">裁剪</button>
+    <button id='btn' onclick="reload()">初始化</button>
+    <button id='btn' onclick="downLoad()">保存png</button>
+</body>
+<script>
+    class RenderCanvas {
+        constructor(){
+            this.node = document.getElementById("myCanvas")
+            this.ctx = this.node.getContext("2d")
+            this.img = new Image()
+            this.isCanDrag = false
+            this.oldX = 0
+            this.oldY = 0
+            this.isEnd = false
+            this.isDown = false
+            this.isUp = true
+            this.x1 = 10
+            this.y1 = 10
+            this.x2 = 260
+            this.y2 = 10
+            this.x3 = 510
+            this.y3 = 10
+            this.x4 = 510
+            this.y4 = 260
+            this.x5 = 510
+            this.y5 = 510
+            this.x6 = 260
+            this.y6 = 510
+            this.x7 = 10
+            this.y7 = 510
+            this.x8 = 10
+            this.y8 = 260
+        }
+        init(){
+            this.img.src = './img/iii.jpg'
+            this.img.onload = () => {
+                this.ctx.drawImage(this.img,0,0,520,520,0,0,520,520);
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = 'blue';
+                this.ctx.moveTo(this.x1 + 10, this.y1);
+                this.ctx.lineTo(this.x2, this.y2);
+                this.ctx.lineTo(this.x3, this.y3);
+                this.ctx.lineTo(this.x4, this.y4);
+                this.ctx.lineTo(this.x5, this.y5);
+                this.ctx.lineTo(this.x6, this.y6);
+                this.ctx.lineTo(this.x7, this.y7);
+                this.ctx.lineTo(this.x8, this.y8);
+                this.ctx.lineTo(this.x1, this.y1);
+                this.ctx.stroke();
+                this.ctx.closePath();
+                for(let y = 0; y < 3; y++){
+                    for(let x = 0; x < 3; x++){
+                        if(!(y === 1 && x === 1)){
+                            console.log(x * 250, y * 250)
+                            this.ctx.beginPath();
+                            this.ctx.arc(x * 250 + 10, y * 250 + 10,10,0,2*Math.PI);
+                            this.ctx.fillStyle="coral";
+                            this.ctx.closePath();
+                            this.ctx.fill()
+                        }
+                    }
+                }
+            }
+        }
+        Intersect(x1,x2,y1,y2){
+            let dx = x2-x1;
+            let dy = y2-y1;
+            let distance = Math.sqrt(dx*dx+dy*dy);
+            return distance < 20
+        }
+        render(){
+            this.ctx.clearRect(0, 0, 520, 520);
+            this.ctx.drawImage(this.img,0,0,520,520,0,0,520,520);
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = 'blue';
+            this.ctx.moveTo(this.x1, this.y1);
+            this.ctx.lineTo(this.x2, this.y2);
+            this.ctx.lineTo(this.x3, this.y3);
+            this.ctx.lineTo(this.x4, this.y4);
+            this.ctx.lineTo(this.x5, this.y5);
+            this.ctx.lineTo(this.x6, this.y6);
+            this.ctx.lineTo(this.x7, this.y7);
+            this.ctx.lineTo(this.x8, this.y8);
+            this.ctx.lineTo(this.x1, this.y1);
+            this.ctx.stroke();
+            this.ctx.closePath();
+            this.ctx.beginPath();
+            this.ctx.arc(this.x1, this.y1,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x2, this.y2,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x3, this.y3,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x4, this.y4,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x5, this.y5,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x6, this.y6,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x7, this.y7,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+            this.ctx.beginPath();
+            this.ctx.arc(this.x8, this.y8,10,0,2*Math.PI);
+            this.ctx.fillStyle="coral";
+            this.ctx.closePath();
+            this.ctx.fill()
+        }
+        events(){
+            this.node.addEventListener('mousedown',(e) => {
+                //处理下canvas鼠标按下事件
+                // this.isDown = true
+                // this.isUp = false
+                console.log(e.layerX,e.layerY,'按下')
+                if(e.layerX > this.x1 -10 && e.layerX < this.x1+10 &&  e.layerY > this.y1-10 && e.layerY < this.y1+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick1 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球1內按下')
+                }
+                if(e.layerX > this.x2 -10 && e.layerX < this.x2+10 &&  e.layerY > this.y2-10 && e.layerY < this.y2+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick2 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球2內按下')
+                }
+                if(e.layerX > this.x3 -10 && e.layerX < this.x3+10 &&  e.layerY > this.y3-10 && e.layerY < this.y3+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick3 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球3內按下')
+                }
+                if(e.layerX > this.x4 -10 && e.layerX < this.x4+10 &&  e.layerY > this.y4-10 && e.layerY < this.y4+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick4 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球4內按下')
+                }
+                if(e.layerX > this.x5 -10 && e.layerX < this.x5+10 &&  e.layerY > this.y5-10 && e.layerY < this.y5+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick5 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球5內按下')
+                }
+                if(e.layerX > this.x6 -10 && e.layerX < this.x6+10 &&  e.layerY > this.y6-10 && e.layerY < this.y6+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick6 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球6內按下')
+                }
+                if(e.layerX > this.x7 -10 && e.layerX < this.x7+10 &&  e.layerY > this.y7-10 && e.layerY < this.y7+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick7 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球7內按下')
+                }
+                if(e.layerX > this.x8 -10 && e.layerX < this.x8+10 &&  e.layerY > this.y8-10 && e.layerY < this.y8+10){
+                    this.isDown = true
+                    this.isUp = false
+                    this.isClick8 = true
+                    this.isCanDrag = true
+                    console.log(e.layerX,e.layerY,'在球8內按下')
+                }
+            })
+            this.node.addEventListener('mousemove',(e) => {
+                if(this.isDown && !this.isUp && this.isClick1 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x1
+                        this.oldY = this.y1
+                        this.x1 = e.layerX
+                        this.y1 = e.layerY
+                        if(this.x1 <= 10){
+                            this.x1 = 10
+                        }
+                        if(this.y1 <= 10){
+                            this.y1 = 10
+                        }
+                        if(this.x1 >= 510){
+                            this.x1 = 510
+                        }
+                        if(this.y1 >= 510){
+                            this.y1 = 510
+                        }
+                        if(this.Intersect(this.x1,this.x2,this.y1,this.y2) || this.Intersect(this.x1,this.x3,this.y1,this.y3) || this.Intersect(this.x1,this.x4,this.y1,this.y4) || this.Intersect(this.x1,this.x5,this.y1,this.y5) || this.Intersect(this.x1,this.x6,this.y1,this.y6) || this.Intersect(this.x1,this.x7,this.y1,this.y7) || this.Intersect(this.x1,this.x8,this.y1,this.y8)){
+                            this.isCanDrag = false
+                            this.x1 = this.oldX
+                            this.y1 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick2 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x2
+                        this.oldY = this.y2
+                        this.x2 = e.layerX
+                        this.y2 = e.layerY
+                        if(this.x2 <= 10){
+                            this.x2 = 10
+                        }
+                        if(this.y2 <= 10){
+                            this.y2 = 10
+                        }
+                        if(this.x2 >= 510){
+                            this.x2 = 510
+                        }
+                        if(this.y2 >= 510){
+                            this.y2 = 510
+                        }
+                        if(this.Intersect(this.x2,this.x1,this.y2,this.y1) || this.Intersect(this.x2,this.x3,this.y2,this.y3) || this.Intersect(this.x2,this.x4,this.y2,this.y4) || this.Intersect(this.x2,this.x5,this.y2,this.y5) || this.Intersect(this.x2,this.x6,this.y2,this.y6) || this.Intersect(this.x2,this.x7,this.y2,this.y7) || this.Intersect(this.x2,this.x8,this.y2,this.y8)){
+                            this.isCanDrag = false
+                            this.x2 = this.oldX
+                            this.y2 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick3 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x3
+                        this.oldY = this.y3
+                        this.x3 = e.layerX
+                        this.y3 = e.layerY
+                        if(this.x3 <= 10){
+                            this.x3 = 10
+                        }
+                        if(this.y3 <= 10){
+                            this.y3 = 10
+                        }
+                        if(this.x3 >= 510){
+                            this.x3 = 510
+                        }
+                        if(this.y3 >= 510){
+                            this.y3 = 510
+                        }
+                        if(this.Intersect(this.x3,this.x1,this.y3,this.y1) || this.Intersect(this.x3,this.x2,this.y3,this.y2) || this.Intersect(this.x3,this.x4,this.y3,this.y4) || this.Intersect(this.x3,this.x5,this.y3,this.y5) || this.Intersect(this.x3,this.x6,this.y3,this.y6) || this.Intersect(this.x3,this.x7,this.y3,this.y7) || this.Intersect(this.x3,this.x8,this.y3,this.y8)){
+                            this.isCanDrag = false
+                            this.x3 = this.oldX
+                            this.y3 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick4 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x4
+                        this.oldY = this.y4
+                        this.x4 = e.layerX
+                        this.y4 = e.layerY
+                        if(this.x4 <= 10){
+                            this.x4 = 10
+                        }
+                        if(this.y4 <= 10){
+                            this.y4 = 10
+                        }
+                        if(this.x4 >= 510){
+                            this.x4 = 510
+                        }
+                        if(this.y4 >= 510){
+                            this.y4 = 510
+                        }
+                        if(this.Intersect(this.x4,this.x1,this.y4,this.y1) || this.Intersect(this.x4,this.x2,this.y4,this.y2) || this.Intersect(this.x4,this.x3,this.y4,this.y3) || this.Intersect(this.x4,this.x5,this.y4,this.y5) || this.Intersect(this.x4,this.x6,this.y4,this.y6) || this.Intersect(this.x4,this.x7,this.y4,this.y7) || this.Intersect(this.x4,this.x8,this.y4,this.y8)){
+                            this.isCanDrag = false
+                            this.x4 = this.oldX
+                            this.y4 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick5 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x5
+                        this.oldY = this.y5
+                        this.x5 = e.layerX
+                        this.y5 = e.layerY
+                        if(this.x5 <= 10){
+                            this.x5 = 10
+                        }
+                        if(this.y5 <= 10){
+                            this.y5 = 10
+                        }
+                        if(this.x5 >= 510){
+                            this.x5 = 510
+                        }
+                        if(this.y5 >= 510){
+                            this.y5 = 510
+                        }
+                        if(this.Intersect(this.x5,this.x1,this.y5,this.y1) || this.Intersect(this.x5,this.x2,this.y5,this.y2) || this.Intersect(this.x5,this.x3,this.y5,this.y3) || this.Intersect(this.x5,this.x4,this.y5,this.y4) || this.Intersect(this.x5,this.x6,this.y5,this.y6) || this.Intersect(this.x5,this.x7,this.y5,this.y7) || this.Intersect(this.x5,this.x8,this.y5,this.y8)){
+                            this.isCanDrag = false
+                            this.x5 = this.oldX
+                            this.y5 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick6 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x6
+                        this.oldY = this.y6
+                        this.x6 = e.layerX
+                        this.y6 = e.layerY
+                        if(this.x6 <= 10){
+                            this.x6 = 10
+                        }
+                        if(this.y6 <= 10){
+                            this.y6 = 10
+                        }
+                        if(this.x6 >= 510){
+                            this.x6 = 510
+                        }
+                        if(this.y6 >= 510){
+                            this.y6 = 510
+                        }
+                        if(this.Intersect(this.x6,this.x1,this.y6,this.y1) || this.Intersect(this.x6,this.x2,this.y6,this.y2) || this.Intersect(this.x6,this.x3,this.y6,this.y3) || this.Intersect(this.x6,this.x4,this.y6,this.y4) || this.Intersect(this.x6,this.x5,this.y6,this.y5) || this.Intersect(this.x6,this.x7,this.y6,this.y7) || this.Intersect(this.x6,this.x8,this.y6,this.y8)){
+                            this.isCanDrag = false
+                            this.x6 = this.oldX
+                            this.y6 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick7 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x7
+                        this.oldY = this.y7
+                        this.x7 = e.layerX
+                        this.y7 = e.layerY
+                        if(this.x7 <= 10){
+                            this.x7 = 10
+                        }
+                        if(this.y7 <= 10){
+                            this.y7 = 10
+                        }
+                        if(this.x7 >= 510){
+                            this.x7 = 510
+                        }
+                        if(this.y7 >= 510){
+                            this.y7 = 510
+                        }
+                        if(this.Intersect(this.x7,this.x1,this.y7,this.y1) || this.Intersect(this.x7,this.x2,this.y7,this.y2) || this.Intersect(this.x7,this.x3,this.y7,this.y3) || this.Intersect(this.x7,this.x4,this.y7,this.y4) || this.Intersect(this.x7,this.x5,this.y7,this.y5) || this.Intersect(this.x7,this.x6,this.y7,this.y6) || this.Intersect(this.x7,this.x8,this.y7,this.y8)){
+                            this.isCanDrag = false
+                            this.x7 = this.oldX
+                            this.y7 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                if(this.isDown && !this.isUp && this.isClick8 && !this.isEnd){
+                    if(this.isCanDrag){
+                        this.oldX = this.x8
+                        this.oldY = this.y8
+                        this.x8 = e.layerX
+                        this.y8 = e.layerY
+                        if(this.x8 <= 10){
+                            this.x8 = 10
+                        }
+                        if(this.y8 <= 10){
+                            this.y8 = 10
+                        }
+                        if(this.x8 >= 510){
+                            this.x8 = 510
+                        }
+                        if(this.y8 >= 510){
+                            this.y8 = 510
+                        }
+                        if(this.Intersect(this.x8,this.x1,this.y8,this.y1) || this.Intersect(this.x8,this.x2,this.y8,this.y2) || this.Intersect(this.x8,this.x3,this.y8,this.y3) || this.Intersect(this.x8,this.x4,this.y8,this.y4) || this.Intersect(this.x8,this.x5,this.y8,this.y5) || this.Intersect(this.x8,this.x6,this.y8,this.y6) || this.Intersect(this.x8,this.x7,this.y8,this.y7)){
+                            this.isCanDrag = false
+                            this.x8 = this.oldX
+                            this.y8 = this.oldY
+                        }
+                        this.render()
+                    }
+                }
+                
+            })
+            
+            this.node.addEventListener('mouseup',(e) => {
+                this.isDown = false
+                this.isUp = true
+                this.isClick1 = false
+                this.isClick2 = false
+                this.isClick3 = false
+                this.isClick4 = false
+                this.isClick5 = false
+                this.isClick6 = false
+                this.isClick7 = false
+                this.isClick8 = false
+                this.isClick9 = false
+                console.log(e.layerX,e.layerY,'松开')
+            })
+            this.node.addEventListener('mouseout', (e) => {
+                
+                //处理canvas的按下鼠标事件
+                this.isDown = false
+                this.isUp = true
+                this.isClick1 = false
+                this.isClick2 = false
+                this.isClick3 = false
+                this.isClick4 = false
+                this.isClick5 = false
+                this.isClick6 = false
+                this.isClick7 = false
+                this.isClick8 = false
+                this.isClick9 = false
+                console.log(e.layerX,e.layerY,'离开')
+            })
+        }
+        tailoring(){
+            this.ctx.clearRect(0, 0, 520, 520);
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.x1, this.y1);
+            this.ctx.lineTo(this.x2, this.y2);
+            this.ctx.lineTo(this.x3, this.y3);
+            this.ctx.lineTo(this.x4, this.y4);
+            this.ctx.lineTo(this.x5, this.y5);
+            this.ctx.lineTo(this.x6, this.y6);
+            this.ctx.lineTo(this.x7, this.y7);
+            this.ctx.lineTo(this.x8, this.y8);
+            this.ctx.lineTo(this.x1, this.y1);
+            this.ctx.stroke();
+            this.ctx.closePath();
+            this.ctx.clip();//次方法下面的部分为待剪切区域，上面的部分为剪切区域
+            this.ctx.drawImage(this.img,0,0,520,520,0,0,520,520);
+            this.isEnd = true
+        }
+        reload(){
+            window.location.reload()
+        }
+        downLoad(){
+            var url = this.node.toDataURL("image/png");
+            var oA = document.createElement("a");
+            oA.download = '';// 设置下载的文件名，默认是'下载'
+            oA.href = url;
+            document.body.appendChild(oA);
+            oA.click();
+            oA.remove(); // 下载之后把创建的元素删除
+        }
+    }
+    let b = new RenderCanvas()
+    b.init()
+    b.events()
+    function tailoring(){
+        b.tailoring()
+    }
+    function reload(){
+        b.reload()
+    }
+    function downLoad(){
+        b.downLoad()
+    }
+</script>
+<!-- <script type="text/javascript">
+    
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var img = new Image();
+    var isCanDrag = false
+    var oldX = 0
+    var oldY = 0
+    var isEnd = false
+    var isDown = false
+    var isUp = true
+    let [x1,y1] = [10, 10]
+    let [x2,y2] = [260,10]
+    let [x3,y3] = [510,10]
+    let [x4,y4] = [510,260]
+    let [x5,y5] = [510,510]
+    let [x6,y6] = [260,510]
+    let [x7,y7] = [10,510]
+    let [x8,y8] = [10,260]
+    let [x9,y9] = [10,10]
+    let [isClick1,isClick2,isClick3,isClick4,isClick5,isClick6,isClick7,isClick8] = [false,false,false,false,false,false,false,false]
+    img.src = './img/iii.jpg'
+    img.onload = function(){
+        ctx.drawImage(img,0,0,520,520,0,0,520,520);
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(x1 + 10, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+        ctx.lineTo(x5, y5);
+        ctx.lineTo(x6, y6);
+        ctx.lineTo(x7, y7);
+        ctx.lineTo(x8, y8);
+        ctx.lineTo(x9, y9);
+        ctx.stroke();
+        ctx.closePath();
+        for(let y = 0; y < 3; y++){
+            for(let x = 0; x < 3; x++){
+                if(!(y === 1 && x === 1)){
+                    console.log(x * 250, y * 250)
+                    ctx.beginPath();
+                    ctx.arc(x * 250 + 10, y * 250 + 10,10,0,2*Math.PI);
+                    ctx.fillStyle="coral";
+                    ctx.closePath();
+                    ctx.fill()
+                }
+            }
+        }
+    }
+    
+    
+    
+    var Intersect = function(x1,x2,y1,y2) {
+        var dx = x2-x1;
+        var dy = y2-y1;
+        var distance = Math.sqrt(dx*dx+dy*dy);
+        console.log(distance)
+        return distance < 20
+    }
+    
+    var render = function(){
+        ctx.clearRect(0, 0, 520, 520);
+        ctx.drawImage(img,0,0,520,520,0,0,520,520);
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+        ctx.lineTo(x5, y5);
+        ctx.lineTo(x6, y6);
+        ctx.lineTo(x7, y7);
+        ctx.lineTo(x8, y8);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+        ctx.closePath();
+        
+        
+        ctx.beginPath();
+        ctx.arc(x1, y1,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x2, y2,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x3, y3,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x4, y4,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x5, y5,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x6, y6,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x7, y7,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+        
+        ctx.beginPath();
+        ctx.arc(x8, y8,10,0,2*Math.PI);
+        ctx.fillStyle="coral";
+        ctx.closePath();
+        ctx.fill()
+    }
+    c.addEventListener('mousedown',function (e) {
+        
+        //处理canvas的按下鼠标事件
+        isDown = true
+        isUp = false
+        console.log(e.layerX,e.layerY,'按下')
+        if(e.layerX > x1 -10 && e.layerX < x1+10 &&  e.layerY > y1-10 && e.layerY < y1+10){
+            isDown = true
+            isUp = false
+            isClick1 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球1內按下')
+        }
+        if(e.layerX > x2 -10 && e.layerX < x2+10 &&  e.layerY > y2-10 && e.layerY < y2+10){
+            isDown = true
+            isUp = false
+            isClick2 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球2內按下')
+        }
+        if(e.layerX > x3 -10 && e.layerX < x3+10 &&  e.layerY > y3-10 && e.layerY < y3+10){
+            isDown = true
+            isUp = false
+            isClick3 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球3內按下')
+        }
+        if(e.layerX > x4 -10 && e.layerX < x4+10 &&  e.layerY > y4-10 && e.layerY < y4+10){
+            isDown = true
+            isUp = false
+            isClick4 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球4內按下')
+        }
+        if(e.layerX > x5 -10 && e.layerX < x5+10 &&  e.layerY > y5-10 && e.layerY < y5+10){
+            isDown = true
+            isUp = false
+            isClick5 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球5內按下')
+        }
+        if(e.layerX > x6 -10 && e.layerX < x6+10 &&  e.layerY > y6-10 && e.layerY < y6+10){
+            isDown = true
+            isUp = false
+            isClick6 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球6內按下')
+        }
+        if(e.layerX > x7 -10 && e.layerX < x7+10 &&  e.layerY > y7-10 && e.layerY < y7+10){
+            isDown = true
+            isUp = false
+            isClick7 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球7內按下')
+        }
+        if(e.layerX > x8 -10 && e.layerX < x8+10 &&  e.layerY > y8-10 && e.layerY < y8+10){
+            isDown = true
+            isUp = false
+            isClick8 = true
+            isCanDrag = true
+            console.log(e.layerX,e.layerY,'在球8內按下')
+        }
+    })
+    
+    c.addEventListener('mousemove',function (e) {
+        if(isDown && !isUp && isClick1 && !isEnd){
+            if(isCanDrag){
+                oldX = x1
+                oldY = y1
+                x1 = e.layerX
+                y1 = e.layerY
+                if(x1 <= 10){
+                    x1 = 10
+                }
+                if(y1 <= 10){
+                    y1 = 10
+                }
+                if(x1 >= 510){
+                    x1 = 510
+                }
+                if(y1 >= 510){
+                    y1 = 510
+                }
+                if(Intersect(x1,x2,y1,y2) || Intersect(x1,x3,y1,y3) || Intersect(x1,x4,y1,y4) || Intersect(x1,x5,y1,y5) || Intersect(x1,x6,y1,y6) || Intersect(x1,x7,y1,y7) || Intersect(x1,x8,y1,y8)){
+                    isCanDrag = false
+                    x1 = oldX
+                    y1 = oldY
+                }
+                render()
+            }
+        }
+        
+        
+        if(isDown && !isUp && isClick2 && !isEnd){
+            if(isCanDrag){
+                oldX = x2
+                oldY = y2
+                x2 = e.layerX
+                y2 = e.layerY
+                if(x2 <= 10){
+                    x2 = 10
+                }
+                if(y2 <= 10){
+                    y2 = 10
+                }
+                if(x2 >= 510){
+                    x2 = 510
+                }
+                if(y2 >= 510){
+                    y2 = 510
+                }
+                if(Intersect(x2,x1,y2,y1) || Intersect(x2,x3,y2,y3) || Intersect(x2,x4,y2,y4) || Intersect(x2,x5,y2,y5) || Intersect(x2,x6,y2,y6) || Intersect(x2,x7,y2,y7) || Intersect(x2,x8,y2,y8)){
+                    isCanDrag = false
+                    x2 = oldX
+                    y2 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick3 && !isEnd){
+            if(isCanDrag){
+                oldX = x3
+                oldY = y3
+                x3 = e.layerX
+                y3 = e.layerY
+                if(x3 <= 10){
+                    x3 = 10
+                }
+                if(y3 <= 10){
+                    y3 = 10
+                }
+                if(x3 >= 510){
+                    x3 = 510
+                }
+                if(y3 >= 510){
+                    y3 = 510
+                }
+                if(Intersect(x3,x1,y3,y1) || Intersect(x3,x2,y3,y2) || Intersect(x3,x4,y3,y4) || Intersect(x3,x5,y3,y5) || Intersect(x3,x6,y3,y6) || Intersect(x3,x7,y3,y7) || Intersect(x3,x8,y3,y8)){
+                    isCanDrag = false
+                    x3 = oldX
+                    y3 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick4 && !isEnd){
+            if(isCanDrag){
+                oldX = x4
+                oldY = y4
+                x4 = e.layerX
+                y4 = e.layerY
+                if(x4 <= 10){
+                    x4 = 10
+                }
+                if(y4 <= 10){
+                    y4 = 10
+                }
+                if(x4 >= 510){
+                    x4 = 510
+                }
+                if(y4 >= 510){
+                    y4 = 510
+                }
+                if(Intersect(x4,x1,y4,y1) || Intersect(x4,x2,y4,y2) || Intersect(x4,x3,y4,y3) || Intersect(x4,x5,y4,y5) || Intersect(x4,x6,y4,y6) || Intersect(x4,x7,y4,y7) || Intersect(x4,x8,y4,y8)){
+                    isCanDrag = false
+                    x4 = oldX
+                    y4 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick5 && !isEnd){
+            if(isCanDrag){
+                oldX = x5
+                oldY = y5
+                x5 = e.layerX
+                y5 = e.layerY
+                if(x5 <= 10){
+                    x5 = 10
+                }
+                if(y5 <= 10){
+                    y5 = 10
+                }
+                if(x5 >= 510){
+                    x5 = 510
+                }
+                if(y5 >= 510){
+                    y5 = 510
+                }
+                if(Intersect(x5,x1,y5,y1) || Intersect(x5,x2,y5,y2) || Intersect(x5,x3,y5,y3) || Intersect(x5,x4,y5,y4) || Intersect(x5,x6,y5,y6) || Intersect(x5,x7,y5,y7) || Intersect(x5,x8,y5,y8)){
+                    isCanDrag = false
+                    x5 = oldX
+                    y5 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick6 && !isEnd){
+            if(isCanDrag){
+                oldX = x6
+                oldY = y6
+                x6 = e.layerX
+                y6 = e.layerY
+                if(x6 <= 10){
+                    x6 = 10
+                }
+                if(y6 <= 10){
+                    y6 = 10
+                }
+                if(x6 >= 510){
+                    x6 = 510
+                }
+                if(y6 >= 510){
+                    y6 = 510
+                }
+                if(Intersect(x6,x1,y6,y1) || Intersect(x6,x2,y6,y2) || Intersect(x6,x3,y6,y3) || Intersect(x6,x4,y6,y4) || Intersect(x6,x5,y6,y5) || Intersect(x6,x7,y6,y7) || Intersect(x6,x8,y6,y8)){
+                    isCanDrag = false
+                    x6 = oldX
+                    y6 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick7 && !isEnd){
+            if(isCanDrag){
+                oldX = x7
+                oldY = y7
+                x7 = e.layerX
+                y7 = e.layerY
+                if(x7 <= 10){
+                    x7 = 10
+                }
+                if(y7 <= 10){
+                    y7 = 10
+                }
+                if(x7 >= 510){
+                    x7 = 510
+                }
+                if(y7 >= 510){
+                    y7 = 510
+                }
+                if(Intersect(x7,x1,y7,y1) || Intersect(x7,x2,y7,y2) || Intersect(x7,x3,y7,y3) || Intersect(x7,x4,y7,y4) || Intersect(x7,x5,y7,y5) || Intersect(x7,x6,y7,y6) || Intersect(x7,x8,y7,y8)){
+                    isCanDrag = false
+                    x7 = oldX
+                    y7 = oldY
+                }
+                render()
+            }
+        }
+        if(isDown && !isUp && isClick8 && !isEnd){
+            if(isCanDrag){
+                oldX = x8
+                oldY = y8
+                x8 = e.layerX
+                y8 = e.layerY
+                if(x8 <= 10){
+                    x8 = 10
+                }
+                if(y8 <= 10){
+                    y8 = 10
+                }
+                if(x8 >= 510){
+                    x8 = 510
+                }
+                if(y8 >= 510){
+                    y8 = 510
+                }
+                if(Intersect(x8,x1,y8,y1) || Intersect(x8,x2,y8,y2) || Intersect(x8,x3,y8,y3) || Intersect(x8,x4,y8,y4) || Intersect(x8,x5,y8,y5) || Intersect(x8,x6,y8,y6) || Intersect(x8,x7,y8,y7)){
+                    isCanDrag = false
+                    x8 = oldX
+                    y8 = oldY
+                }
+                render()
+            }
+        }
+        
+    })
+    c.addEventListener('mouseup',function(e){
+        
+        isDown = false
+        isUp = true
+        isClick1 = false
+        isClick2 = false
+        isClick3 = false
+        isClick4 = false
+        isClick5 = false
+        isClick6 = false
+        isClick7 = false
+        isClick8 = false
+        isClick9 = false
+        console.log(e.layerX,e.layerY,'松开')
+    })
+    c.addEventListener('mouseout',function (e) {
+        
+        //处理canvas的按下鼠标事件
+        isDown = false
+        isUp = true
+        isClick1 = false
+        isClick2 = false
+        isClick3 = false
+        isClick4 = false
+        isClick5 = false
+        isClick6 = false
+        isClick7 = false
+        isClick8 = false
+        isClick9 = false
+        console.log(e.layerX,e.layerY,'离开')
+    })
+    //裁剪
+    function tailoring(){
+        ctx.clearRect(0, 0, 520, 520);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+        ctx.lineTo(x5, y5);
+        ctx.lineTo(x6, y6);
+        ctx.lineTo(x7, y7);
+        ctx.lineTo(x8, y8);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.clip();//次方法下面的部分为待剪切区域，上面的部分为剪切区域
+        ctx.drawImage(img,0,0,520,520,0,0,520,520);
+        isEnd = true
+    }
+    //初始化
+    function reload(){
+        location.reload()
+    }
+    // 保存成png格式的图片
+    function downLoad(){
+        var url = c.toDataURL("image/png");
+        var oA = document.createElement("a");
+        oA.download = '';// 设置下载的文件名，默认是'下载'
+        oA.href = url;
+        document.body.appendChild(oA);
+        oA.click();
+        oA.remove(); // 下载之后把创建的元素删除
+    }
+</script> -->
+</html>
