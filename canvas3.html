@@ -81,11 +81,15 @@
                 }
             }
         }
-        Intersect(x1,x2,y1,y2){
+        Intersect(x1,x2,y1,y2,type){
             let dx = x2-x1;
             let dy = y2-y1;
             let distance = Math.sqrt(dx*dx+dy*dy);
-            return distance < 20
+            if(type){
+                return distance <= 10
+            }else{
+                return distance <= 20
+            }
         }
         render(){
             this.ctx.clearRect(0, 0, 520, 520);
@@ -149,57 +153,57 @@
                 //处理下canvas鼠标按下事件
                 // this.isDown = true
                 // this.isUp = false
-                console.log(e.layerX,e.layerY,'按下')
-                if(e.layerX > this.x1 -10 && e.layerX < this.x1+10 &&  e.layerY > this.y1-10 && e.layerY < this.y1+10){
+                console.log(e.layerX,e.layerY,'按下',this.x1,this.y1)
+                if(this.Intersect(this.x1,e.layerX,this.y1,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick1 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球1內按下')
                 }
-                if(e.layerX > this.x2 -10 && e.layerX < this.x2+10 &&  e.layerY > this.y2-10 && e.layerY < this.y2+10){
+                if(this.Intersect(this.x2,e.layerX,this.y2,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick2 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球2內按下')
                 }
-                if(e.layerX > this.x3 -10 && e.layerX < this.x3+10 &&  e.layerY > this.y3-10 && e.layerY < this.y3+10){
+                if(this.Intersect(this.x3,e.layerX,this.y3,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick3 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球3內按下')
                 }
-                if(e.layerX > this.x4 -10 && e.layerX < this.x4+10 &&  e.layerY > this.y4-10 && e.layerY < this.y4+10){
+                if(this.Intersect(this.x4,e.layerX,this.y4,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick4 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球4內按下')
                 }
-                if(e.layerX > this.x5 -10 && e.layerX < this.x5+10 &&  e.layerY > this.y5-10 && e.layerY < this.y5+10){
+                if(this.Intersect(this.x5,e.layerX,this.y5,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick5 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球5內按下')
                 }
-                if(e.layerX > this.x6 -10 && e.layerX < this.x6+10 &&  e.layerY > this.y6-10 && e.layerY < this.y6+10){
+                if(this.Intersect(this.x6,e.layerX,this.y6,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick6 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球6內按下')
                 }
-                if(e.layerX > this.x7 -10 && e.layerX < this.x7+10 &&  e.layerY > this.y7-10 && e.layerY < this.y7+10){
+                if(this.Intersect(this.x7,e.layerX,this.y7,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick7 = true
                     this.isCanDrag = true
                     console.log(e.layerX,e.layerY,'在球7內按下')
                 }
-                if(e.layerX > this.x8 -10 && e.layerX < this.x8+10 &&  e.layerY > this.y8-10 && e.layerY < this.y8+10){
+                if(this.Intersect(this.x8,e.layerX,this.y8,e.layerY,10)){
                     this.isDown = true
                     this.isUp = false
                     this.isClick8 = true
